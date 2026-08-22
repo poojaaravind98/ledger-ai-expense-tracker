@@ -1,0 +1,140 @@
+// Prisma Schema for Ledger AI Expense Tracker
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String            @id @default(uuid())
+  email         String            @unique
+  passwordHash  String
+  name          String
+  avatar        String?
+  currency      String            @default("USD")
+  monthlyIncome Float             @default(5000)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  expenses      Expense[]
+  categories    Category[]
+  budgets       Budget[]
+  receipts      ReceiptDocument[]
+  chatMessages  ChatMessage[]
+  agentReports  AgentReport[]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  icon      String    @default("Folder")
+  color     String    @default("#6366F1")
+  isCustom  Boolean   @default(false)
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  expenses  Expense[]
+  budgets   Budget[]
+}
+
+model Expense {
+  id            String           @id @default(uuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      Category         @relation(fields: [categoryId], references: [id])
+  amount        Float
+  currency      String           @default("USD")
+  title         String
+  merchant      String?
+  date          DateTime         @default(now())
+  paymentMethod String           @default("CREDIT_CARD") // CASH, CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, CRYPTO, OTHER
+  tags          String?          // Comma-separated or JSON string
+  receiptId     String?
+  receipt       ReceiptDocument? @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  notes         String?
+  isRecurring   Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model Budget {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  amount         Float
+  period         String    @default("MONTHLY") // MONTHLY, WEEKLY, YEARLY
+  alertThreshold Float     @default(80)       // Alert when 80% used
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model ReceiptDocument {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename     String
+  originalName String
+  mimeType     String
+  fileSize     Int
+  filePath     String
+  rawText      String?
+  status       String        @default("PROCESSED") // PENDING, PROCESSING, PROCESSED, FAILED
+  errorMessage String?       // Optional human‑readable error when status = FAILED
+  parsedData   String?       // JSON representation of extracted data
+  totalAmount  Float?
+  currency     String        @default("USD")
+  merchant     String?
+  invoiceDate  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  expenses     Expense[]
+  items        ReceiptItem[]
+}
+
+model ReceiptItem {
+  id          String          @id @default(uuid())
+  receiptId   String
+  receipt     ReceiptDocument @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float           @default(1)
+  unitPrice   Float           @default(0)
+  totalPrice  Float           @default(0)
+  category    String?
+  createdAt   DateTime        @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   // "user" | "assistant" | "system"
+  content   String
+  sources   String?  // JSON stringified source chunks if RAG was used
+  createdAt DateTime @default(now())
+}
+
+model AgentReport {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  status           String   @default("COMPLETED") // RUNNING, COMPLETED, FAILED
+  healthScore      Int      @default(75)          // 0 - 100
+  analysisSummary  String   // JSON string of Analysis Agent results
+  budgetAssessment String   // JSON string of Budgeting Agent results
+  recommendations  String   // JSON string of Recommendations Agent results
+  actionItems      String   // JSON array of actionable items
+  createdAt        DateTime @default(now())
+}

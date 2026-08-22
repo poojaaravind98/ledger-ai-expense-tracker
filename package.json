@@ -1,0 +1,17 @@
+{
+  "name": "ledger",
+  "version": "1.0.0",
+  "description": "Intelligent AI Expense Tracker with RAG, Receipt OCR, and Multi-Agent Optimization",
+  "private": true,
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build:server": "npm --prefix server run build",
+    "build:client": "npm --prefix client run build",
+    "db:push": "npm --prefix server run prisma:push",
+    "db:seed": "npm --prefix server run prisma:seed"
+  },
+  "keywords": ["ai", "finance", "expense-tracker", "rag", "agents", "react19", "typescript", "express"],
+  "author": "Ledger Team",
+  "license": "MIT"
+}
