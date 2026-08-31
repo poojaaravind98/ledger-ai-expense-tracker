@@ -20,7 +20,7 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({
 }) => {
   const [categoryId, setCategoryId] = useState<string>('');
   const [amount, setAmount] = useState('');
-  const [period, setPeriod] = useState('MONTHLY');
+  const [period, setPeriod] = useState<'MONTHLY' | 'WEEKLY' | 'YEARLY'>('MONTHLY');
   const [alertThreshold, setAlertThreshold] = useState('80');
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -132,7 +132,9 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({
             <label className="block text-xs font-medium text-gray-300 mb-1">Period</label>
             <select
               value={period}
-              onChange={(e) => setPeriod(e.target.value)}
+              onChange={(e) =>
+  setPeriod(e.target.value as 'MONTHLY' | 'WEEKLY' | 'YEARLY')
+}
               className="w-full px-3.5 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-white text-sm focus:border-indigo-500 focus:outline-none"
             >
               <option value="MONTHLY">Monthly</option>

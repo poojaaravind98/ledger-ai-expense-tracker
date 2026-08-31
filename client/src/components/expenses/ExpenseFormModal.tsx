@@ -77,10 +77,10 @@ export const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
           title: title.trim(),
           amount: parseFloat(amount),
           categoryId,
-          merchant: merchant.trim() || null,
+          merchant: merchant.trim() || undefined,
           date,
           paymentMethod,
-          notes: notes.trim() || null,
+          notes: notes.trim() || undefined,
           isRecurring,
         });
       } else {
@@ -88,10 +88,10 @@ export const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
           title: title.trim(),
           amount: parseFloat(amount),
           categoryId,
-          merchant: merchant.trim() || null,
+          merchant: merchant.trim() ||undefined,
           date,
           paymentMethod,
-          notes: notes.trim() || null,
+          notes: notes.trim() || undefined,
           isRecurring,
         });
       }
