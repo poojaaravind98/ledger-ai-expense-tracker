@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx tsx watch src/server.ts",
     "build": "npx tsc",
-    "start": "node dist/server.js",
+    "start": "npm run prisma:push && npm run prisma:seed && node dist/server.js",
     "prisma:generate": "npx prisma generate --schema=./src/prisma/schema.prisma",
     "prisma:push": "npx prisma db push --schema=./src/prisma/schema.prisma",
     "prisma:seed": "npx tsx src/prisma/seed.ts",

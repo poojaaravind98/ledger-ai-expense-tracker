@@ -10,10 +10,20 @@ async function main() {
 
   // 1. Create Demo User
   const demoEmail = 'alex@ledger.io';
-  await prisma.user.deleteMany({ where: { email: demoEmail } });
 
-  const passwordHash = await bcrypt.hash('password123', 10);
-  const user = await prisma.user.create({
+const existingUser = await prisma.user.findUnique({
+  where: { email: demoEmail },
+});
+
+if (existingUser) {
+  console.log(`👤 Demo user already exists: ${existingUser.email}`);
+  console.log('✅ Skipping seed to avoid duplicate demo data.');
+  return;
+}
+
+const passwordHash = await bcrypt.hash('password123', 10);
+
+const user = await prisma.user.create({
     data: {
       email: demoEmail,
       name: 'Alex Vance',
